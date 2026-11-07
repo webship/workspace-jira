@@ -84,7 +84,7 @@ let _twgStale: TwgVersions | null = null;
 // stale the next time the minimum moves.
 function twgUpdateNeeded(text: unknown): TwgVersions | null {
   const t = String(text || '');
-  if (!/minimum supported version/i.test(t) && !/update required/i.test(t)) return null;
+  if (!/minimum supported version/i.test(t) && !/update required|upgrade recommended/i.test(t)) return null;
   const ver = (m: RegExpMatchArray | null) => (m ? m[1].replace(/\.$/, '') : '');
   const running = t.match(/running\s+v?(\d[\d.]*)/i);
   const minimum = t.match(/minimum\s+(?:supported\s+)?version\s+v?(\d[\d.]*)/i);
@@ -94,7 +94,7 @@ function twgUpdateNeeded(text: unknown): TwgVersions | null {
 /**
  * What to do about it — and the second half is the part that is easy to miss.
  *
- * `twg update` on the host is the fix the CLI names, and on a machine where the dashboard runs in its
+ * `twg upgrade` on the host is the fix the CLI names, and on a machine where the dashboard runs in its
  * own container it is only half of one: the container used to bind-mount the BINARY, which binds an
  * inode, so an updated host binary never reached it. That is fixed for new containers (the bin
  * directory is mounted and /usr/local/bin/twg is a wrapper), but a container built before that change
@@ -104,7 +104,7 @@ function twgUpdateHint(v: TwgVersions | null): string {
   const versions = v && v.running && v.minimum
     ? `The dashboard is running twg ${v.running}; Jira needs ${v.minimum}. `
     : '';
-  return `${versions}On the host, run: twg update.`
+  return `${versions}On the host, run: twg upgrade.`
     + ' If the dashboard still reports the old version afterwards, run ddev restart in'
     + ' core/workspace-app once — a container created before this fix mounted the binary itself,'
     + ' which pins the file it was started with rather than following an update.';
@@ -145,15 +145,16 @@ async function twgAuthProbe() {
 
 // Synchronous, for the renderers: '' when signed in or not yet known, the hint when the
 // last probe said AUTH_REQUIRED. Kicks off a refresh when the answer is stale.
-// `twg login` writes its session to ~/.config/twg/auth.conf, which the dashboard shares
+// `twg login` writes its session under ~/.config/twg, which the dashboard shares
 // from the host — so ABSENT is a definitive "never signed in" that costs no network and
 // is right on the FIRST render. That matters: the async probe answers "unknown" until it
 // has run once, and unknown renders as usable, which is exactly the fresh-machine case
 // this is here to catch. A present file only means a session was written, not that it is
 // still valid, so that case still goes to the probe.
-const TWG_SESSION = path.join(process.env.HOME || '', '.config', 'twg', 'auth.conf');
+// Where the CLI keeps its session, by version: auth.conf until 1.3, auth-profiles.json from 1.3.9 on.
+const TWG_SESSION_FILES = ['auth-profiles.json', 'auth.conf'].map((f) => path.join(process.env.HOME || '', '.config', 'twg', f));
 function twgSessionFileExists() {
-  try { return fs.statSync(TWG_SESSION).size > 0; } catch (_) { return false; }
+  return TWG_SESSION_FILES.some((f) => { try { return fs.statSync(f).size > 0; } catch (_) { return false; } });
 }
 
 function twgAuthReason() {

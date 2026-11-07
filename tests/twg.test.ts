@@ -32,6 +32,10 @@ test('it still reads when the CLI hard-wraps its prose, and a full stop is not p
   assert.strictEqual(twg.twgUpdateNeeded('running v2.0, minimum supported version v2.5.')!.minimum, '2.5');
 });
 
+test('the newer wording is recognised too', () => {
+  assert.deepStrictEqual(twg.twgUpdateNeeded('Upgrade recommended: Please run `twg upgrade`: this CLI is running v1.3.9, below the minimum supported version v1.4.4.'), { running: '1.3.9', minimum: '1.4.4' });
+});
+
 test('every other failure is left alone', () => {
   for (const other of ['AUTH_REQUIRED: authentication required', 'no issues found', '', undefined]) {
     assert.strictEqual(twg.twgUpdateNeeded(other), null, String(other));
@@ -42,9 +46,9 @@ test('the message names both halves of the fix', () => {
   const hint = twg.twgUpdateHint(twg.twgUpdateNeeded(REAL));
   assert.match(hint, /running twg 1\.2\.7/);
   assert.match(hint, /needs 1\.3\.1/);
-  assert.match(hint, /twg update/);
+  assert.match(hint, /twg upgrade/);
   assert.match(hint, /ddev restart/);
-  assert.match(twg.twgUpdateHint(null), /^On the host, run: twg update\./);
+  assert.match(twg.twgUpdateHint(null), /^On the host, run: twg upgrade\./);
 });
 
 test('the version failure outranks the login one, in the gate and in the list', () => {
