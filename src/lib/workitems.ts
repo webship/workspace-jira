@@ -105,7 +105,7 @@ export default function workitems(api: PluginApi, twg: ReturnType<typeof TwgT>, 
     // What twg can see is cached for ten minutes. A modal that waits for it opens in seconds on a cold
     // cache, so it opens on the allowlist or the default at once and asks in the background; the
     // next opening has the whole list.
-    const live = twg.jiraProjectListCached();
+    let live = twg.jiraProjectListCached();
     if (!live) twg.warmJiraProjects();
     // jira.projects, when set, is the ALLOWLIST: only these projects are offered,
     // whatever twg can see. Empty or absent means everything twg can see.
@@ -113,6 +113,9 @@ export default function workitems(api: PluginApi, twg: ReturnType<typeof TwgT>, 
       .map((k) => String(k || '').trim().toUpperCase()).filter((k) => /^[A-Z][A-Z0-9]+$/.test(k));
     const fallback = (allowed.length ? allowed : [String(jiraCfg.default_project || '').trim().toUpperCase()])
       .filter((k) => /^[A-Z][A-Z0-9]+$/.test(k)).map((k) => ({ key: k, name: '' }));
+    // Nothing configured to fall back on (a fresh plugin file still says CHANGE_ME) and the cache is
+    // cold: wait for twg this once rather than answer "no projects" to a machine that has them.
+    if (!live && !fallback.length) live = await twg.jiraProjectList();
     const jiraChoices = (live && live.length)
       ? (allowed.length ? live.filter((p) => allowed.includes(p.key)) : live)
       : fallback;
