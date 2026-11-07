@@ -32,7 +32,7 @@ test('searching replaces the results only, so the box keeps its focus, and narro
 });
 
 test('opening never waits for the list of Jira projects: it is read from the cache and warmed in the background', () => {
-  assert.match(src, /const live = twg\.jiraProjectListCached\(\);\s*if \(!live\) twg\.warmJiraProjects\(\);/);
+  assert.match(src, /let live = twg\.jiraProjectListCached\(\);\s*if \(!live\) twg\.warmJiraProjects\(\);/);
   const route = src.slice(src.indexOf('async function list('), src.indexOf('async function list(') + 3000);
   assert.match(route, /if \(!live && !fallback\.length\) live = await twg\.jiraProjectList\(\);/, 'waited for only when nothing is configured to fall back on');
 });
