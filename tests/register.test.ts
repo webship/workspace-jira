@@ -31,10 +31,11 @@ test('the row menu needs a default project and a usable twg, and says which is m
   register(api);
   const ctx: any = { key: 'dev', project: 'site1', dir: path.join(root, 'dev'), meta: {}, allowed: new Set(['jira']), vals: () => '' };
   const html = calls.rowMenus.jira.fn(ctx);
-  // This machine has no twg on the paths the plugin looks at, so the button is there and disabled.
+  // Whether this machine has twg, and a session, decides which of the two the row gets: the menu, or
+  // the disabled button that says what is missing. Both are the plugin's doing; the test accepts either.
   assert.match(html, /JIRA/);
-  assert.match(html, /disabled/);
-  assert.match(html, /twg missing|twg not signed in|twg out of date/);
+  if (/disabled/.test(html)) assert.match(html, /twg missing|twg not signed in|twg out of date/);
+  else assert.match(html, /\/fragments\/p\/jira\/list\/dev\/site1/, 'a usable twg opens the workitems list');
   const { api: api2, calls: calls2 } = fakeApi(root, { ...SETTINGS, default_project: '' });
   register(api2);
   assert.strictEqual(calls2.rowMenus.jira.fn(ctx), null, 'no default project, no menu');

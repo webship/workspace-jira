@@ -1,6 +1,6 @@
 {
   "name": "@webship/workspace-jira",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Jira for Webship Workspace, over the Teamwork Graph CLI (twg): the JIRA menu on every site row, the workitems list, one-workitem modal (analyze, do the work with Claude Code, runs, comment, worklog), agent badges, a New-folder workitem, and the twg session mounted into the dashboard container.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
