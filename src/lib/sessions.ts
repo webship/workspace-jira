@@ -21,7 +21,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { PluginLib } from '@webship/workspace-plugin-api';
+import type { PluginLib } from '@webship.co/workspace-plugin-api';
 
 export interface RunNote { session: string; key: string; project: string; dir: string; at: number; claude: string }
 export interface Run extends RunNote { live: boolean }

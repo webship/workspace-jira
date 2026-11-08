@@ -1,4 +1,4 @@
-# @webship/workspace-jira
+# @webship.co/workspace-jira
 
 Jira for the [Webship Workspace](https://github.com/webship/workspace) dashboard, over the Teamwork
 Graph CLI (`twg`): the **JIRA** menu on every site row, the workitems list (open, sprint, mine; a key

@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { ActionContext, PluginApi } from '@webship/workspace-plugin-api';
+import type { ActionContext, PluginApi } from '@webship.co/workspace-plugin-api';
 
 import type TwgT from './twg';
 import type SessionsT from './sessions';

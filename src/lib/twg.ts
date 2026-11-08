@@ -7,7 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { PluginLib } from '@webship/workspace-plugin-api';
+import type { PluginLib } from '@webship.co/workspace-plugin-api';
 
 export interface JiraProject { key: string; name: string }
 export interface TwgState { ok: boolean; reason: string }
