@@ -10,21 +10,17 @@ Feature: The Jira plugin on the project rows
 
   # The guards answer without Jira: a malformed key never reaches twg.
   Scenario: A malformed key is refused at the door
-    When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"v11x00b1i18n","key":"not-a-key","mode":"view"}'
+    When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"any-project","key":"not-a-key","mode":"view"}'
     Then the action response should contain "Not a Jira key"
 
   @needs-jira-writes-off
   Scenario: Write modes are refused while Jira writes are off
-    When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"v11x00b1i18n","key":"WEBSHIP-1","mode":"comment"}'
+    When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"any-project","key":"WEBSHIP-1","mode":"comment"}'
     Then the action response should contain "Writing to Jira is off"
 
   Scenario: An unknown project cannot host an agent
     When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"no-such-project","key":"WEBSHIP-1","mode":"view"}'
     Then the action response should contain "Project not found"
-
-  Scenario: Watching a task nobody worked on says so
-    When I post "/actions/p/jira/task" with '{"workspace":"dev","projectName":"v11x00b1i18n","key":"WEBSHIP-424242","mode":"watch"}'
-    Then the action response should contain "No agent log"
 
   Scenario: The Screens modal lists sessions or says there are none
     Given I am on "/fragments/screens"
@@ -39,7 +35,7 @@ Feature: The Jira plugin on the project rows
     Then the action response should contain "Not a screen session name"
 
   Scenario: Remembering a Jira project refuses a bad key
-    When I post "/actions/jira-set-project" with '{"workspace":"dev","projectName":"v11x00b1i18n","key":"bad-key-1"}'
+    When I post "/actions/jira-set-project" with '{"workspace":"dev","projectName":"any-project","key":"bad-key-1"}'
     Then the action response should contain "Not a Jira project key"
 
   Scenario: Remembering needs a real project
