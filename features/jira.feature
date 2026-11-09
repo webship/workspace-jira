@@ -35,9 +35,9 @@ Feature: The Jira plugin on the project rows
     Then the action response should contain "Not a screen session name"
 
   Scenario: Remembering a Jira project refuses a bad key
-    When I post "/actions/jira-set-project" with '{"workspace":"dev","projectName":"any-project","key":"bad-key-1"}'
+    When I post "/actions/p/jira/set-project" with '{"workspace":"dev","projectName":"any-project","key":"bad-key-1"}'
     Then the action response should contain "Not a Jira project key"
 
   Scenario: Remembering needs a real project
-    When I post "/actions/jira-set-project" with '{"workspace":"dev","projectName":"no-such","key":"WEBSHIP"}'
+    When I post "/actions/p/jira/set-project" with '{"workspace":"dev","projectName":"no-such","key":"WEBSHIP"}'
     Then the action response should contain "Project not found"
