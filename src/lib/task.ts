@@ -47,11 +47,12 @@ async function jira_task({ form, send, workspace }: ActionContext) {
     const src = String(form.projectName || '');
     if (!meta || !meta.typeActions.has('jira')) return send('<div class="msg error">This workspace has no Jira surface.</div>', 400);
     if (!/^[A-Z][A-Z0-9]+-[0-9]+$/.test(jKey)) return send('<div class="msg error">Not a Jira key.</div>', 400);
-    if (!NAME_RE.test(src) || !fs.existsSync(path.join(meta.dir, src))) return send('<div class="msg error">Project not found.</div>', 404);
+    // The cheap guards first: the write gate is a setting, not a fact about the project.
     const jiraWrites = String(settings().allow_writes) === 'true';
     if (!jiraWrites && ['comment', 'worklog'].includes(mode)) {
       return send('<div class="msg error">Writing to Jira is off (allow_writes in plugin.jira.settings.yml). Analyze, View and local work stay available.</div>', 403);
     }
+    if (!NAME_RE.test(src) || !fs.existsSync(path.join(meta.dir, src))) return send('<div class="msg error">Project not found.</div>', 404);
     const projectDir = path.join(meta.dir, src);
     const claudeIn = (dir: string, prompt: string, tools: string) =>
       `cd ${JSON.stringify(dir)} && claude -p ${JSON.stringify(prompt)} ${tools} --verbose --no-session-persistence`;
