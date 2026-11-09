@@ -4,6 +4,7 @@ Feature: The Jira plugin on the project rows
 
   # The menu is gated on twg + settings; in this environment both hold, so the
   # rows carry the menu and the modal link.
+  @needs-setting-jira-default_project
   Scenario: The JIRA menu is on the project rows
     Given I am on "/dev"
      Then "[hx-get^='/fragments/p/jira/list/dev/']" should be attached
