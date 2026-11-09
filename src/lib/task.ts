@@ -21,12 +21,13 @@ async function jira_set_project({ form, res, send, workspace }: ActionContext) {
     const src = String(form.projectName || '');
     const jKey = String(form.key || '').trim().toUpperCase();
     if (!meta || !meta.typeActions.has('jira')) return send('<div class="msg error">This workspace has no Jira surface.</div>', 400);
+    // The key's shape first: a key that is not a key is refused whatever folder it was typed for.
+    if (jKey && !/^[A-Z][A-Z0-9]+$/.test(jKey)) return send('<div class="msg error">Not a Jira project key.</div>', 400);
     if (!NAME_RE.test(src) || !fs.existsSync(path.join(meta.dir, src))) return send('<div class="msg error">Project not found.</div>', 404);
     const file = path.join(meta.dir, src, '.jira-project');
     if (!jKey) {
       try { fs.unlinkSync(file); } catch (_) { /* was not set */ }
     } else {
-      if (!/^[A-Z][A-Z0-9]+$/.test(jKey)) return send('<div class="msg error">Not a Jira project key.</div>', 400);
       fs.writeFileSync(file, `${jKey}\n`);
     }
     // Answer with the reloaded modal so the remember state is what the file now says.
