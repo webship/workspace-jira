@@ -33,6 +33,14 @@
   "workspacePlugin": {
     "name": "jira",
     "label": "Jira",
+    "needs": {
+      "commands": [
+        {
+          "command": "twg",
+          "hint": "https://developer.atlassian.com/cloud/twg-cli/"
+        }
+      ]
+    },
     "settingsFile": "plugin.jira.settings.yml",
     "settingsTemplate": "config/plugin.jira.settings.yml",
     "labels": "config/settings.labels.yml",
