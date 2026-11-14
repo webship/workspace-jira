@@ -20,6 +20,17 @@ bash core/scripts/plugins.sh --configure jira        # core/config/plugin.jira.s
 On the host: `twg login --force` once (the dashboard shares `~/.config/twg`). `scripts/host-install.sh`
 installs twg and reports whether it is signed in; `plugins.sh --install` runs its `--check`.
 
+## What it needs
+
+On the machine this plugin needs `twg` (https://developer.atlassian.com/cloud/twg-cli/), and its manifest says so (`needs.commands`). The workspace reports it and never installs it:
+
+```bash
+bash core/scripts/plugins.sh --check jira      # found, with its version, or missing, with how to install it
+webship-workspace doctor                        # the same for the core and every plugin
+```
+
+It needs no other plugin: its menu is on the project rows of whatever folders the workspace has.
+
 ## What the package holds
 
 | Path | What it is |
