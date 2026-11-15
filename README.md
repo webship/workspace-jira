@@ -12,13 +12,30 @@ page, and the `twg` session mounted from the host into the dashboard container.
 ```bash
 cd ~/workspace
 bash core/scripts/plugins.sh --require github:webship/workspace-jira
-bash core/scripts/plugins.sh --activate jira
+bash core/scripts/plugins.sh --activate jira --with-needs
 bash core/scripts/plugins.sh --install jira          # then: cd core/workspace-app && ddev restart (the twg mount)
 bash core/scripts/plugins.sh --configure jira        # core/config/plugin.jira.settings.yml: site, account, default_project…
 ```
 
 On the host: `twg login --force` once (the dashboard shares `~/.config/twg`). `scripts/host-install.sh`
 installs twg and reports whether it is signed in; `plugins.sh --install` runs its `--check`.
+
+## The items it carries
+
+The workspace is container-based (DDEV by default). Each item lands in the folder of its kind, when
+that folder is an active workspace folder, is listed there like any other item, and is installed
+into Claude Code from there:
+
+| What | Lands in | What it is for |
+| --- | --- | --- |
+| The agent `jira-workitem-manager` | `ai-agents/` | Reads and lists workitems with `twg`, files one for the work in a folder and remembers its Jira project. The agent the New folder form asks for |
+| The skill `jira-workitems` | `ai-skills/` | The JIRA menu, the scopes and tabs of its window, the `twg` call behind each read, the keys of `plugin.jira.settings.yml`, `.jira-project` |
+| The command `/jira-workitem` | `ai-commands/` | `/jira-workitem <KEY> [<project>]`: what a workitem asks for and whether it applies to a project. Read-only |
+| The prompt `jira-open-workitems` | `ai-prompts/` | The launch command of a session that lists the open workitems of a Jira project and says which to take next |
+
+The plugin places no `cmd-*.sh`: `twg jira workitem get` and `twg jira workitem query` are the terminal commands, and a wrapper would add nothing to them. The item bodies are plain Markdown any AI command-line assistant can follow; Claude Code is the default shape (frontmatter, the launch command of the prompt).
+
+How the items are laid out and checked: [docs/plugin-items-pattern.md](docs/plugin-items-pattern.md).
 
 ## What it needs
 
@@ -29,7 +46,7 @@ bash core/scripts/plugins.sh --check jira      # found, with its version, or mis
 webship-workspace doctor                        # the same for the core and every plugin
 ```
 
-It needs no other plugin: its menu is on the project rows of whatever folders the workspace has.
+It also needs the AI folders its items are placed in (`needs`): `ai-agents`, `ai-skills`, `ai-commands` and `ai-prompts`. `--require` says so, `--activate` and `--install` stop until the workspace has them, and `--with-needs` adds what is missing first. A kind whose folder is not an active workspace folder is skipped, and the install says so. It needs no sites folder: its menu is on the project rows of whatever folders the workspace has.
 
 ## What the package holds
 
@@ -45,3 +62,8 @@ It needs no other plugin: its menu is on the project rows of whatever folders th
 | `scripts/host-install.sh` | The host side: twg installed (sha256-verified), signed in |
 | `public/jira.css` | The plugin's styles |
 | `features/jira.feature` | Browser scenarios, installed into the dashboard's `tests/features/plugins/jira/` |
+| `ai/agents/jira-workitem-manager.md` | The agent `jira-workitem-manager` |
+| `ai/skills/jira-workitems/` | The skill `jira-workitems` |
+| `ai/commands/jira-workitem.md` | The command `/jira-workitem` |
+| `ai/prompts/jira-open-workitems.md` | The prompt `jira-open-workitems` |
+| `tests/items.test.ts` | The shape of every item, and that it names nothing the plugin does not have |

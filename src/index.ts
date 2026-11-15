@@ -22,6 +22,12 @@ import workitemsFactory from './lib/workitems';
 const KEY_RE = /^[A-Z][A-Z0-9]+-[0-9]+$/;
 const PROJECT_RE = /^[A-Z][A-Z0-9]+$/;
 
+/** The AI items the installer places: agents in ai-agents/, skills in ai-skills/, commands in ai-commands/, prompts in ai-prompts/. */
+export const AGENTS: string[] = ['jira-workitem-manager'];
+export const SKILLS: string[] = ['jira-workitems'];
+export const AI_COMMANDS: string[] = ['jira-workitem'];
+export const PROMPTS: string[] = ['jira-open-workitems'];
+
 export function register(api: PluginApi): void {
   const { esc, workspaceDir, hubDomain, screensCached } = api.lib;
   const twg = twgFactory(api.lib);
