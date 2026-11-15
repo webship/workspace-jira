@@ -1,0 +1,11 @@
+# twg 1.4.4: each command an item may name, with the flags its --help lists
+twg login --env --force --help --new-profile --no-verify --site
+twg jira space list --action --after --category-id --cloud-id --expand --first --help --id --input-json --key --limit --property --property-query --query --site --sort-by --start-at --status --type-key --variables-json
+twg jira workitem get --batch-concurrency --comments --field --fields --full --help --id --issue-id --key --remote-links --strict --variables-json
+twg jira workitem query --after --before --cloud-id --fields --field-sets-input --first --help --issue-search-input --jql --last --limit --namespace --options --save-jqlto-user-history --scope --site --variables-json --view-config-input
+twg jira workitem create --assignee --description --description-format --field --fields-json --help --labels --parent --priority --reporter --space --summary --type --variables-json --yes
+twg jira workitem update --add-components --add-fix-versions --add-labels --assignee --comment --comment-format --components --description --description-format --due-date --field --fields-json --fix-versions --help --id --labels --original-estimate --parent --priority --remaining-estimate --remove-components --remove-fix-versions --remove-labels --resolution --sprint --status --story-points --summary --team --transition-comment --transition-comment-format --type
+twg jira workitem comment create --body --body-format --help --internal --issue-id --parent-id --site --variables-json --visibility-group --visibility-role
+twg jira workitem worklog add --adjust-estimate --comment --comment-format --expand --help --input-json --issue-id --new-estimate --notify-users --override-editable --properties-json --reduce-by --site --started --time-spent --time-spent-seconds --variables-json --visibility-json
+twg jira workitem worklog query --after --expand --first --help --input-json --issue-id --site --started-after --started-before --variables-json
+twg upgrade --channel --check --help --refresh-skills --version --yes
