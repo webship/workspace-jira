@@ -40,6 +40,11 @@ test('the row menu needs a default project and a usable twg, and says which is m
   register(api2);
   assert.strictEqual(calls2.rowMenus.jira.fn(ctx), null, 'no default project, no menu');
   assert.strictEqual(calls.rowMenus.jira.fn({ ...ctx, allowed: new Set() }), null, 'a type that does not allow jira gets nothing');
+  // A fresh install: the settings file still holds the placeholder.
+  const { api: api3, calls: calls3 } = fakeApi(root, { ...SETTINGS, default_project: 'CHANGE_ME' });
+  register(api3);
+  assert.strictEqual(calls3.rowMenus.jira.fn(ctx), null, 'the placeholder is no project: no menu named CHANGE_ME');
+  assert.strictEqual(calls3.setups[0].html('dev', { allowed: new Set(['jira']) }), '', 'and the New-folder form offers no workitem in CHANGE_ME');
 });
 
 test('a work key in a folder name links to the configured site; an agent at work shows its key', () => {
