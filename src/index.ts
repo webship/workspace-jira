@@ -37,7 +37,12 @@ export function register(api: PluginApi): void {
   const settings = () => api.settings.read() || {};
   const base = `/fragments/p/${api.name}`;
   const site = () => String(settings().site || 'https://CHANGE_ME.atlassian.net').replace(/\/$/, '');
-  const defaultProject = () => String(settings().default_project || '').trim();
+  // A fresh settings file says CHANGE_ME: that is no project. Only a real key (letters and digits,
+  // starting with a letter) counts, so the menu and the New-folder line wait for one.
+  const defaultProject = () => {
+    const key = String(settings().default_project || '').trim();
+    return /^[A-Za-z][A-Za-z0-9]+$/.test(key) ? key : '';
+  };
   const keyLink = (key: string) => `${site()}/browse/${encodeURIComponent(key)}`;
 
   // ---- The JIRA menu on a project row ---------------------------------------------------------
