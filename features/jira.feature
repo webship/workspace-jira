@@ -4,7 +4,7 @@ Feature: The Jira plugin on the project rows
 
   # The menu is gated on twg + settings; in this environment both hold, so the
   # rows carry the menu and the modal link.
-  @needs-setting-jira-default_project
+  @needs-setting-jira-default_project @needs-project-dev
   Scenario: The JIRA menu is on the project rows
     Given I am on "/dev"
      Then "[hx-get^='/fragments/p/jira/list/dev/']" should be attached
@@ -43,18 +43,19 @@ Feature: The Jira plugin on the project rows
     When I post "/actions/p/jira/set-project" with '{"workspace":"dev","projectName":"no-such","key":"WEBSHIP"}'
     Then the action response should contain "Project not found"
 
+  # The AI folders are searched by name: with every plugin on, a folder lists more than one page of items.
   Scenario: The AI Agents folder lists the agent the plugin ships
-    Given I am on "/ai-agents"
+    Given I am on "/ai-agents?q=jira-workitem-manager"
      Then I should see "jira-workitem-manager"
 
   Scenario: The AI Skills folder lists the skill the plugin ships
-    Given I am on "/ai-skills"
+    Given I am on "/ai-skills?q=jira-workitems"
      Then I should see "jira-workitems"
 
   Scenario: The AI Commands folder lists the command the plugin ships
-    Given I am on "/ai-commands"
+    Given I am on "/ai-commands?q=jira-workitem"
      Then I should see "jira-workitem"
 
   Scenario: The AI Prompts folder lists the prompt the plugin ships
-    Given I am on "/ai-prompts"
+    Given I am on "/ai-prompts?q=jira-open-workitems"
      Then I should see "jira-open-workitems"
