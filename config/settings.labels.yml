@@ -18,3 +18,6 @@ max_agents:
   label: Task agents at once
   info: How many Claude Code agents may work Jira workitems at the same time. Each is a full session inside a site; too many can exhaust the machine.
   number: { min: 1, max: 8, step: 1 }
+projects:
+  label: Jira projects offered
+  info: The projects the workitems window offers, as a list of keys (an allowlist). Empty offers every project the twg login can see, with the default project preselected. Edit the list in the Raw YAML tab.
