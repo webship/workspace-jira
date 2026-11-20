@@ -70,6 +70,9 @@ function twgAvailable() { return twgState().ok; }
 // refreshes in the background, `twgAuthReason()` answers from the last known result, and
 // an unknown state renders as usable — the same behaviour as before, never worse.
 const TWG_AUTH_TTL = 5 * 60 * 1000;
+// An out-of-date verdict is asked again after a minute: once `twg upgrade` has run on the host, the menu comes back
+// within that minute instead of staying disabled for the rest of the five.
+const TWG_STALE_TTL = 60 * 1000;
 let _twgAuth: { at: number; signedIn: boolean | null; running: boolean } = { at: 0, signedIn: null, running: false };
 // What the last real call said about the version, or null while nothing has said anything. Unknown
 // renders as usable, like the auth probe: a gate that guesses is worse than one that waits.
@@ -126,7 +129,8 @@ const TWG_LOGIN_HINT = 'twg is installed but not signed in. On the host, run: tw
 async function twgAuthProbe() {
   if (!twgAvailable()) return;
   if (_twgAuth.running) return;
-  if (_twgAuth.signedIn !== null && Date.now() - _twgAuth.at < TWG_AUTH_TTL) return;
+  const ttl = _twgStale ? TWG_STALE_TTL : TWG_AUTH_TTL;
+  if (_twgAuth.signedIn !== null && Date.now() - _twgAuth.at < ttl) return;
   _twgAuth.running = true;
   try {
     // The cheapest authenticated call twg has. --limit 1 so a large site costs nothing.
