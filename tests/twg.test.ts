@@ -68,3 +68,40 @@ test('the container follows the host binary instead of pinning it, and the gate 
   const paths = twgSrc.match(/const TWG_PATHS = \[([^\]]+)\]/)![1];
   assert.ok(paths.indexOf("'/host-local-bin/twg'") < paths.indexOf("'/usr/local/bin/twg'"), 'the real binary is checked first');
 });
+
+test('an out-of-date verdict is asked again after a minute, a current one keeps its five', async (t) => {
+  // A twg the factory can find: an executable in the HOME it reads when it is made.
+  const home = fs.mkdtempSync(path.join(require('os').tmpdir(), 'twg-home-'));
+  fs.mkdirSync(path.join(home, '.local', 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.local', 'bin', 'twg'), '#!/bin/sh\n', { mode: 0o755 });
+  const was = process.env.HOME;
+  process.env.HOME = home;
+  let calls = 0;
+  let answer = 'Upgrade recommended: Please run `twg upgrade`: this CLI is running v1.3.8, below the minimum supported version v1.4.4.';
+  const probed = twgFactory({ run: async () => { calls += 1; return { ok: false, code: 1, stdout: answer, stderr: '' }; } } as any);
+  process.env.HOME = was;
+  t.mock.timers.enable({ apis: ['Date'], now: 1_000_000 });
+  try {
+    await probed.twgAuthProbe();
+    assert.strictEqual(calls, 1);
+    assert.ok(probed.twgIsStale());
+    t.mock.timers.tick(30 * 1000);
+    await probed.twgAuthProbe();
+    assert.strictEqual(calls, 1, 'not asked again within the minute');
+    // `twg upgrade` ran on the host.
+    answer = '{"projects":[]}';
+    t.mock.timers.tick(31 * 1000);
+    await probed.twgAuthProbe();
+    assert.strictEqual(calls, 2, 'asked again once the minute is over');
+    assert.ok(!probed.twgIsStale(), 'the upgrade is seen');
+    t.mock.timers.tick(2 * 60 * 1000);
+    await probed.twgAuthProbe();
+    assert.strictEqual(calls, 2, 'a current verdict is kept for its five minutes');
+    t.mock.timers.tick(3 * 60 * 1000 + 1);
+    await probed.twgAuthProbe();
+    assert.strictEqual(calls, 3);
+  } finally {
+    t.mock.timers.reset();
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});
