@@ -35,12 +35,19 @@ if [ -n "${TWG_BIN}" ] ; then
   # success with NO "ok" field at all — only failures carry `"ok": false` and a code — so
   # the first version of this check (grep for `"ok": true`) reported EVERY signed-in CLI as
   # signed out. Matching the failure is also robust to the success shape changing.
-  if ! "${TWG_BIN}" jira space list --limit 1 2>&1 | grep -qE '"ok": *false|AUTH_REQUIRED|authentication required' ; then
-    printf '  ✓ %-16s %s\n' "twg" "${TWG_BIN} — signed in" ;
-  else
+  # And signed in only when twg RAN: a twg that is a stand-in for the real one (the dashboard image's wrapper,
+  # which prints "not installed on the host" and exits 127 when the host has none) prints no error marker
+  # either, and was reported as signed in (#43). Exit 0 and no marker is signed in; a marker is a login to do;
+  # anything else is twg not answering, said with its first line.
+  twg_out="$("${TWG_BIN}" jira space list --limit 1 2>&1)" ; twg_rc=$? ;
+  if printf '%s' "${twg_out}" | grep -qE '"ok": *false|AUTH_REQUIRED|authentication required' ; then
     printf '  ✗ %-16s %s\n' "twg" "${TWG_BIN} — NOT signed in: run  ${TWG_BIN/#${HOME}/~} login --force" ;
     printf '  %-18s %s\n' "" "The Jira button appears anyway (the gate is a binary check), and every" ;
     printf '  %-18s %s\n' "" "Jira action answers 'authentication required' until you have signed in." ;
+  elif [ "${twg_rc}" -eq 0 ] ; then
+    printf '  ✓ %-16s %s\n' "twg" "${TWG_BIN} — signed in" ;
+  else
+    printf '  ✗ %-16s %s\n' "twg" "${TWG_BIN} — twg did not answer (exit ${twg_rc}): $(printf '%s\n' "${twg_out}" | head -1)" ;
   fi
 else
   printf '  ✗ %-16s %s\n' "twg" "missing — the Jira button stays hidden (teamworkgraph.com/cli)" ;
