@@ -150,8 +150,8 @@ export default function workitems(api: PluginApi, twg: ReturnType<typeof TwgT>, 
   <h3 class="uk-margin-small-bottom">${esc(jiraProject)} workitems — for ${esc(jWs)}/${esc(jName)}</h3>
   <p class="uk-text-meta">Open workitems from Jira, through the Teamwork Graph CLI. Analyze first;
     "Do the work" runs Claude Code inside the project and ends by commenting and logging on the workitem.</p>
-  <form hx-get="${listBase}/results" hx-target="#jira-results" hx-swap="innerHTML" hx-sync="this:replace"
-        hx-trigger="input changed delay:350ms from:find input[name=q], change from:find select[name=scope], submit">
+  <form hx-get="${listBase}/results" hx-target="#jira-results" hx-swap="innerHTML" hx-sync="this:queue last"
+        hx-trigger="input[target.name!='project'] delay:350ms, submit">
     <label class="uk-form-label">Jira project
       <select class="uk-select uk-margin-small-bottom" name="project" hx-get="${listBase}" hx-target="#editor-modal-body"
               hx-swap="innerHTML" hx-include="closest form" hx-trigger="change">
