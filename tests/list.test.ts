@@ -25,7 +25,10 @@ test('the three reads run together', () => {
 
 test('searching replaces the results only, so the box keeps its focus, and narrows the cards on screen at once', () => {
   assert.match(src, /hx-target="#jira-results"/);
-  assert.match(src, /hx-sync="this:replace"/);
+  // htmx 4 reads `from:find …` otherwise: the triggers sit on the form, where an input of the filter and of the Scope
+  // bubbles; the Jira project select reloads the modal itself and is left out. Queued, so no request is aborted.
+  assert.match(src, /hx-sync="this:queue last"\s+hx-trigger="input\[target\.name!='project'\] delay:350ms, submit"/);
+  assert.doesNotMatch(src, /from:find|from:closest/);
   assert.match(src, /data-list-find="#jira-results"/, "the dashboard's quick filter, pointed at this list");
   assert.match(src, /jira-card/);
   assert.match(src, /data-find=/);
